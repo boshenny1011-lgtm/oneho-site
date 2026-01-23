@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { WooCommerceStoreProduct } from '@/lib/woocommerce.types';
+import { getBestProductImage } from '@/lib/image-matcher';
 
 interface EnhancedStoreGridProps {
   products: WooCommerceStoreProduct[];
@@ -45,7 +46,7 @@ function MobileProductGrid({ products }: { products: WooCommerceStoreProduct[] }
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {products.map((product) => {
-            const imageUrl = product.images[0]?.src;
+            const imageUrl = getBestProductImage(product);
             const price = formatStorePrice(product);
             
             return (
@@ -181,7 +182,7 @@ function DesktopProductShowcase({ products, categoryName }: { products: WooComme
   if (products.length === 0) return null;
 
   const currentProduct = products[currentIndex] || products[0];
-  const imageUrl = currentProduct.images[0]?.src;
+  const imageUrl = getBestProductImage(currentProduct);
   const price = formatStorePrice(currentProduct);
 
   return (
@@ -274,7 +275,7 @@ function DesktopProductShowcase({ products, categoryName }: { products: WooComme
             <div className="relative">
               <div className="relative aspect-square">
                 {products.map((product, index) => {
-                  const productImageUrl = product.images[0]?.src;
+                  const productImageUrl = getBestProductImage(product);
                   return (
                     <div
                       key={product.id}

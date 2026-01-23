@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { WooCommerceStoreProduct } from '@/lib/woocommerce.types';
 import { ArrowRight } from 'lucide-react';
+import { getBestProductImage } from '@/lib/image-matcher';
 
 interface StoreProductCardProps {
   product: WooCommerceStoreProduct;
@@ -27,7 +28,7 @@ function formatStorePrice(product: WooCommerceStoreProduct): string {
 }
 
 export default function StoreProductCard({ product }: StoreProductCardProps) {
-  const imageUrl = product.images[0]?.src;
+  const imageUrl = getBestProductImage(product);
   const price = formatStorePrice(product);
 
   return (

@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { WooCommerceStoreProduct } from '@/lib/woocommerce.types';
 import { ArrowLeft, ShoppingCart, Truck, Shield, Loader2 } from 'lucide-react';
+import { getBestProductImage } from '@/lib/image-matcher';
 
 interface ProductDetailClientProps {
   productId: number;
@@ -84,7 +85,7 @@ export default function ProductDetailClient({ productId }: ProductDetailClientPr
     );
   }
 
-  const imageUrl = product.images?.[0]?.src || 'https://images.pexels.com/photos/90946/pexels-photo-90946.jpeg';
+  const imageUrl = getBestProductImage(product) || 'https://images.pexels.com/photos/90946/pexels-photo-90946.jpeg';
 
   const price = product.prices?.price
     ? Number(product.prices.price) / 10 ** (product.prices.currency_minor_unit ?? 2)
@@ -218,17 +219,28 @@ export default function ProductDetailClient({ productId }: ProductDetailClientPr
             <div className="mt-16 pt-16 border-t border-border">
               <h2 className="text-3xl font-medium text-foreground mb-8">More Images</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {product.images.slice(1).map((image) => (
-                  <div key={image.id} className="aspect-square relative bg-secondary border border-border overflow-hidden">
-                    <Image
-                      src={image.src}
-                      alt={image.alt || product?.name || 'Product image'}
-                      fill
-                      className="object-cover hover:scale-105 transition-transform duration-300"
-                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                    />
-                  </div>
-                ))}
+                {product.images.slice(1).map((image) => {
+                  // 对于额外图片，优先使用 API 返回的，如果没有则尝试本地匹配
+                  const imageSrc = image.src && !image.src.includes('placeholder') 
+                    ? image.src 
+                    : `/${product.id}_${image.id}.png`; // 尝试基于商品ID和图片ID的命名
+                  
+                  return (
+                    <div key={image.id} className="aspect-square relative bg-secondary border border-border overflow-hidden">
+                      <Image
+                        src={imageSrc}
+                        alt={image.alt || product?.name || 'Product image'}
+                        fill
+                        className="object-cover hover:scale-105 transition-transform duration-300"
+                        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                        onError={(e) => {
+                          // 如果图片加载失败，可以尝试其他路径或显示占位符
+                          console.warn('Image failed to load:', imageSrc);
+                        }}
+                      />
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
