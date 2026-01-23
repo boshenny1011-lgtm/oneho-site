@@ -5,6 +5,7 @@ import StoreSidebar from './StoreSidebar';
 import StoreGrid from './StoreGrid';
 import EnhancedStoreGrid from './EnhancedStoreGrid';
 import type { WooCommerceStoreCategory, WooCommerceStoreProduct } from '@/lib/woocommerce.types';
+import { getCategories, getProducts } from '@/lib/store-api';
 
 interface StorePageClientProps {
   slug: string;
@@ -27,20 +28,8 @@ export default function StorePageClient({ slug }: StorePageClientProps) {
 
         console.log('🔍 [StorePageClient] Fetching data for slug:', slug);
 
-        // Fetch categories from Next.js API route (proxy)
-        const categoriesUrl = '/api/store/categories';
-        console.log('🔍 [StorePageClient] Fetching categories:', categoriesUrl);
-
-        const categoriesResponse = await fetch(categoriesUrl, {
-          cache: 'no-store',
-        });
-
-        if (!categoriesResponse.ok) {
-          const errorData = await categoriesResponse.json().catch(() => ({}));
-          throw new Error(errorData.error || `Failed to fetch categories: ${categoriesResponse.status}`);
-        }
-
-        const filteredCategories: WooCommerceStoreCategory[] = await categoriesResponse.json();
+        // Fetch categories using unified store-api
+        const filteredCategories = await getCategories();
         console.log('✅ [StorePageClient] Fetched categories:', filteredCategories.length);
         console.log('📋 [StorePageClient] Available category slugs:', filteredCategories.map(c => c.slug));
 
@@ -60,20 +49,11 @@ export default function StorePageClient({ slug }: StorePageClientProps) {
 
         console.log('✅ [StorePageClient] Current category:', category.name, 'ID:', category.id);
 
-        // Fetch products from Next.js API route (proxy)
-        const productsUrl = `/api/store/products?category=${category.id}&per_page=24`;
-        console.log('🔍 [StorePageClient] Fetching products:', productsUrl);
-
-        const productsResponse = await fetch(productsUrl, {
-          cache: 'no-store',
+        // Fetch products using unified store-api
+        const productsData = await getProducts({
+          category: category.id,
+          per_page: 24,
         });
-
-        if (!productsResponse.ok) {
-          const errorData = await productsResponse.json().catch(() => ({}));
-          throw new Error(errorData.error || `Failed to fetch products: ${productsResponse.status}`);
-        }
-
-        const productsData: WooCommerceStoreProduct[] = await productsResponse.json();
         console.log('✅ [StorePageClient] Fetched products:', productsData.length);
 
         if (!mounted) return;

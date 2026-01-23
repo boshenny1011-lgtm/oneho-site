@@ -3,37 +3,34 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import type { WooCommerceStoreProduct } from '@/lib/woocommerce.types';
 import { ArrowLeft, ShoppingCart, Truck, Shield, Loader2 } from 'lucide-react';
 import { getBestProductImage } from '@/lib/image-matcher';
+import { useCart } from '@/contexts/CartContext';
 
 interface ProductDetailClientProps {
   productId: number;
 }
 
 export default function ProductDetailClient({ productId }: ProductDetailClientProps) {
+  const router = useRouter();
+  const { addItem, isLoading: cartLoading } = useCart();
   const [product, setProduct] = useState<WooCommerceStoreProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [addingToCart, setAddingToCart] = useState(false);
 
   useEffect(() => {
     async function fetchProduct() {
       try {
-        const response = await fetch(
-          `/api/store/products/${productId}`
-        );
-
-        const contentType = response.headers.get('content-type');
-        if (!contentType?.includes('application/json')) {
-          throw new Error('Expected JSON but got ' + contentType);
+        const { getProductById } = await import('@/lib/store-api');
+        const data = await getProductById(productId);
+        if (data) {
+          setProduct(data);
+        } else {
+          setError('Product not found');
         }
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        setProduct(data);
       } catch (err) {
         console.error('Error fetching product:', err);
         setError(err instanceof Error ? err.message : 'Failed to load product');
@@ -159,9 +156,25 @@ export default function ProductDetailClient({ productId }: ProductDetailClientPr
               )}
 
               <div className="space-y-4 mb-8">
-                <button className="w-full px-8 py-4 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors duration-200 text-base font-medium flex items-center justify-center gap-2">
+                <button
+                  onClick={async () => {
+                    if (!product) return;
+                    setAddingToCart(true);
+                    try {
+                      await addItem(product.id, 1);
+                      // 可选：跳转到购物车页面
+                      // router.push('/cart');
+                    } catch (error) {
+                      console.error('Failed to add to cart:', error);
+                    } finally {
+                      setAddingToCart(false);
+                    }
+                  }}
+                  disabled={addingToCart || cartLoading || !product}
+                  className="w-full px-8 py-4 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors duration-200 text-base font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
                   <ShoppingCart className="w-5 h-5" />
-                  Add to Cart
+                  {addingToCart ? 'Adding...' : 'Add to Cart'}
                 </button>
               </div>
 
