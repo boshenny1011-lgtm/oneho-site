@@ -1,21 +1,26 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import Header from '@/components/Header';
 import { useCart } from '@/contexts/CartContext';
 import { getBestProductImage } from '@/lib/image-matcher';
-import { Trash2, Plus, Minus, ShoppingBag } from 'lucide-react';
+import { ShoppingBag, X, Minus, Plus } from 'lucide-react';
 
 export default function CartPage() {
   const router = useRouter();
-  const { items, removeItem, updateQuantity, getSubtotal, getTotal, clearCart } = useCart();
+  const { items, removeItem, updateQuantity, getSubtotal, clearCart } = useCart();
+  const [country, setCountry] = useState('United States (US)');
+  const [state, setState] = useState('');
+  const [city, setCity] = useState('');
+  const [zipCode, setZipCode] = useState('');
 
   const subtotal = getSubtotal();
-  const tax = subtotal * 0.21;
-  const shipping = subtotal > 100 ? 0 : 10;
-  const total = getTotal();
+  const shippingRate = 22.00;
+  const tax = 0;
+  const total = subtotal + shippingRate + tax;
 
   if (items.length === 0) {
     return (
@@ -27,8 +32,8 @@ export default function CartPage() {
               <ShoppingBag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <h1 className="text-2xl font-medium mb-4">Your cart is empty</h1>
               <Link
-                href="/store"
-                className="inline-block px-6 py-3 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
+                href="/store/microinverters"
+                className="inline-block px-6 py-3 bg-black text-white hover:bg-gray-800 transition-colors"
               >
                 Continue Shopping
               </Link>
@@ -43,142 +48,211 @@ export default function CartPage() {
     <>
       <Header />
       <main className="min-h-screen bg-white pt-20">
-        <div className="max-w-6xl mx-auto px-6 py-12">
-          <h1 className="text-3xl font-medium mb-8">Shopping Cart</h1>
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-8 py-12">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12">
+            You Have {items.length} {items.length === 1 ? 'Item' : 'Items'} In Your Cart
+          </h1>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            {/* 左侧：商品列表 */}
-            <div className="lg:col-span-2 space-y-4">
-              {items.map(item => {
-                const imageUrl = item.product?.image 
-                  ? getBestProductImage({ images: [{ src: item.product.image, id: 0, name: '', alt: '' }] } as any)
-                  : `/${item.productId}.png`;
+          <div className="overflow-x-auto mb-12">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b-2 border-gray-300">
+                  <th className="text-left py-4 px-4 font-bold text-gray-900">Product</th>
+                  <th className="text-left py-4 px-4 font-bold text-gray-900">Price</th>
+                  <th className="text-left py-4 px-4 font-bold text-gray-900">Quantity</th>
+                  <th className="text-left py-4 px-4 font-bold text-gray-900">Subtotal</th>
+                  <th className="w-12"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map(item => {
+                  const imageUrl = item.product?.image
+                    ? getBestProductImage({ images: [{ src: item.product.image, id: 0, name: '', alt: '' }] } as any)
+                    : `/${item.productId}.png`;
+                  const itemTotal = (item.product?.price || 0) * item.quantity;
 
-                return (
-                  <div
-                    key={item.productId}
-                    className="flex gap-4 p-4 border rounded-lg hover:shadow-md transition-shadow"
+                  return (
+                    <tr key={item.productId} className="border-b border-gray-200">
+                      <td className="py-6 px-4">
+                        <div className="flex items-center gap-4">
+                          <Link href={`/product/${item.productId}`} className="flex-shrink-0">
+                            <div className="w-20 h-20 relative bg-gray-100 overflow-hidden">
+                              {imageUrl ? (
+                                <Image
+                                  src={imageUrl}
+                                  alt={item.product?.name || 'Product'}
+                                  fill
+                                  className="object-cover"
+                                  sizes="80px"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                                  No image
+                                </div>
+                              )}
+                            </div>
+                          </Link>
+                          <Link href={`/product/${item.productId}`} className="hover:text-gray-600 transition-colors">
+                            <h3 className="font-medium text-gray-900">
+                              {item.product?.name || `Product ${item.productId}`}
+                            </h3>
+                          </Link>
+                        </div>
+                      </td>
+                      <td className="py-6 px-4">
+                        <span className="text-gray-900">{item.product?.price?.toFixed(2) || '0.00'} €</span>
+                      </td>
+                      <td className="py-6 px-4">
+                        <div className="flex items-center border border-gray-300 w-fit">
+                          <button
+                            onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                            className="px-3 py-2 hover:bg-gray-100 transition-colors border-r border-gray-300"
+                            aria-label="Decrease quantity"
+                          >
+                            <Minus className="w-4 h-4" />
+                          </button>
+                          <span className="px-6 py-2 min-w-[3rem] text-center font-medium">
+                            {item.quantity}
+                          </span>
+                          <button
+                            onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                            className="px-3 py-2 hover:bg-gray-100 transition-colors border-l border-gray-300"
+                            aria-label="Increase quantity"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                      <td className="py-6 px-4">
+                        <span className="text-red-600 font-bold text-lg">{itemTotal.toFixed(2)} €</span>
+                      </td>
+                      <td className="py-6 px-4">
+                        <button
+                          onClick={() => removeItem(item.productId)}
+                          className="text-gray-400 hover:text-red-600 transition-colors"
+                          aria-label="Remove item"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
+            <div className="bg-white border border-gray-200 p-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Calculate shipping</h2>
+
+              <div className="space-y-4">
+                <div>
+                  <select
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-gray-900 text-gray-600"
                   >
-                    <Link href={`/product/${item.productId}`} className="flex-shrink-0">
-                      <div className="w-24 h-24 relative bg-gray-100 rounded-md overflow-hidden">
-                        {imageUrl ? (
-                          <Image
-                            src={imageUrl}
-                            alt={item.product?.name || 'Product'}
-                            fill
-                            className="object-cover"
-                            sizes="96px"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
-                            No image
-                          </div>
-                        )}
-                      </div>
-                    </Link>
+                    <option>United States (US)</option>
+                    <option>United Kingdom (UK)</option>
+                    <option>Germany</option>
+                    <option>France</option>
+                    <option>Spain</option>
+                  </select>
+                </div>
 
-                    <div className="flex-1">
-                      <Link href={`/product/${item.productId}`}>
-                        <h3 className="font-medium hover:text-gray-600 transition-colors">
-                          {item.product?.name || `Product ${item.productId}`}
-                        </h3>
-                      </Link>
-                      {item.product?.sku && (
-                        <p className="text-sm text-gray-500">SKU: {item.product.sku}</p>
-                      )}
-                      <p className="text-lg font-medium mt-2">
-                        €{item.product?.price?.toFixed(2) || '0.00'}
-                      </p>
-                    </div>
-
-                    <div className="flex flex-col items-end justify-between">
-                      <button
-                        onClick={() => removeItem(item.productId)}
-                        className="text-gray-400 hover:text-red-600 transition-colors"
-                        aria-label="Remove item"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-
-                      <div className="flex items-center gap-2 border rounded-md">
-                        <button
-                          onClick={() => updateQuantity(item.productId, item.quantity - 1)}
-                          className="p-2 hover:bg-gray-100 transition-colors"
-                          aria-label="Decrease quantity"
-                        >
-                          <Minus className="w-4 h-4" />
-                        </button>
-                        <span className="px-4 py-2 min-w-[3rem] text-center">
-                          {item.quantity}
-                        </span>
-                        <button
-                          onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-                          className="p-2 hover:bg-gray-100 transition-colors"
-                          aria-label="Increase quantity"
-                        >
-                          <Plus className="w-4 h-4" />
-                        </button>
-                      </div>
-
-                      <p className="text-lg font-medium mt-2">
-                        €{((item.product?.price || 0) * item.quantity).toFixed(2)}
-                      </p>
-                    </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="Washington"
+                      value={state}
+                      onChange={(e) => setState(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-gray-900 placeholder:text-gray-400"
+                    />
                   </div>
-                );
-              })}
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="Town / City"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-gray-900 placeholder:text-gray-400"
+                    />
+                  </div>
+                </div>
 
-              <div className="pt-4">
-                <button
-                  onClick={clearCart}
-                  className="text-sm text-gray-600 hover:text-gray-900 underline"
-                >
-                  Clear cart
+                <div>
+                  <input
+                    type="text"
+                    placeholder="ZIP Code"
+                    value={zipCode}
+                    onChange={(e) => setZipCode(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-gray-900 placeholder:text-gray-400"
+                  />
+                </div>
+
+                <button className="px-8 py-3 bg-red-600 text-white font-bold hover:bg-red-700 transition-colors rounded-full">
+                  UPDATE
                 </button>
               </div>
             </div>
 
-            {/* 右侧：订单摘要 */}
-            <div className="lg:col-span-1">
-              <div className="sticky top-24 bg-gray-50 p-6 rounded-lg">
-                <h2 className="text-xl font-medium mb-4">Order Summary</h2>
+            <div className="bg-white border border-gray-200 p-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Cart totals</h2>
 
-                <div className="space-y-2 mb-4">
-                  <div className="flex justify-between text-sm">
-                    <span>Subtotal</span>
-                    <span>€{subtotal.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>VAT (21%)</span>
-                    <span>€{tax.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Shipping</span>
-                    <span>{shipping === 0 ? 'Free' : `€${shipping.toFixed(2)}`}</span>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center py-3 border-b border-gray-200">
+                  <span className="font-bold text-gray-900">Subtotal</span>
+                  <span className="text-gray-900">{subtotal.toFixed(2)} €</span>
+                </div>
+
+                <div className="py-3 border-b border-gray-200">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="font-bold text-gray-900">Shipping</span>
+                    <div className="text-right">
+                      <div className="text-gray-900">Flat rate: {shippingRate.toFixed(2)} €</div>
+                      <div className="text-sm text-gray-500 mt-1">Shipping to WA.</div>
+                    </div>
                   </div>
                 </div>
 
-                <div className="border-t pt-4 mb-6">
-                  <div className="flex justify-between font-medium text-lg">
-                    <span>Total</span>
-                    <span>€{total.toFixed(2)}</span>
-                  </div>
+                <div className="flex justify-between items-center py-3 border-b border-gray-200">
+                  <span className="font-bold text-gray-900">Tax</span>
+                  <span className="text-gray-900">{tax.toFixed(2)} €</span>
                 </div>
 
-                <Link
-                  href="/checkout"
-                  className="block w-full text-center px-6 py-3 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
-                >
-                  Proceed to Checkout
-                </Link>
+                <div className="flex justify-between items-center py-4">
+                  <span className="font-bold text-gray-900 text-lg">Total</span>
+                  <span className="text-red-600 font-bold text-2xl">{total.toFixed(2)} € EUR</span>
+                </div>
 
-                <Link
-                  href="/store"
-                  className="block w-full text-center mt-4 text-sm text-gray-600 hover:text-gray-900 underline"
-                >
-                  Continue Shopping
-                </Link>
+                <div className="space-y-3 mt-6">
+                  <button className="w-full px-8 py-3 bg-red-600 text-white font-bold hover:bg-red-700 transition-colors rounded-full">
+                    UPDATE CART
+                  </button>
+                  <Link
+                    href="/checkout"
+                    className="block w-full text-center px-8 py-3 bg-red-600 text-white font-bold hover:bg-red-700 transition-colors rounded-full"
+                  >
+                    PROCEED TO CHECKOUT
+                  </Link>
+                </div>
               </div>
+            </div>
+          </div>
+
+          <div className="mt-8 bg-white border border-gray-200 p-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Have A Promotional Code?</h2>
+            <div className="flex gap-4 max-w-md">
+              <input
+                type="text"
+                placeholder="Enter code"
+                className="flex-1 px-4 py-3 border border-gray-300 focus:outline-none focus:border-gray-900 placeholder:text-gray-400"
+              />
+              <button className="px-8 py-3 bg-red-600 text-white font-bold hover:bg-red-700 transition-colors rounded-full">
+                APPLY
+              </button>
             </div>
           </div>
         </div>

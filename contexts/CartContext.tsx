@@ -24,6 +24,7 @@ interface CartContextType {
   getSubtotal: () => number;
   getTotal: () => number;
   isLoading: boolean;
+  cartAnimation: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -31,6 +32,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [cartAnimation, setCartAnimation] = useState(false);
 
   // 从 localStorage 加载购物车
   useEffect(() => {
@@ -68,23 +70,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
     try {
       const product = await fetchProduct(productId);
-      
+
       setItems(prev => {
         const existing = prev.find(item => item.productId === productId);
-        
+
         if (existing) {
-          // 更新数量
           return prev.map(item =>
             item.productId === productId
               ? { ...item, quantity: item.quantity + quantity }
               : item
           );
         } else {
-          // 添加新商品
           const price = product?.prices?.price
             ? parseInt(product.prices.price) / Math.pow(10, product.prices.currency_minor_unit || 2)
             : 0;
-          
+
           return [
             ...prev,
             {
@@ -101,6 +101,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           ];
         }
       });
+
+      setCartAnimation(true);
+      setTimeout(() => setCartAnimation(false), 600);
     } finally {
       setIsLoading(false);
     }
@@ -160,6 +163,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         getSubtotal,
         getTotal,
         isLoading,
+        cartAnimation,
       }}
     >
       {children}

@@ -78,10 +78,37 @@ const config: Config = {
             height: '0',
           },
         },
+        'cart-bounce': {
+          '0%, 100%': {
+            transform: 'translateY(0)',
+          },
+          '25%': {
+            transform: 'translateY(-8px)',
+          },
+          '50%': {
+            transform: 'translateY(-4px)',
+          },
+          '75%': {
+            transform: 'translateY(-6px)',
+          },
+        },
+        'cart-badge': {
+          '0%': {
+            transform: 'scale(0)',
+          },
+          '50%': {
+            transform: 'scale(1.3)',
+          },
+          '100%': {
+            transform: 'scale(1)',
+          },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        'cart-bounce': 'cart-bounce 0.6s ease-in-out',
+        'cart-badge': 'cart-badge 0.4s ease-out',
       },
     },
   },

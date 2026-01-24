@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { ShoppingBag, ChevronDown } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { useCart } from '@/contexts/CartContext';
 
 export default function Header() {
   const pathname = usePathname();
@@ -12,6 +13,7 @@ export default function Header() {
   const [showStoreMenu, setShowStoreMenu] = useState(false);
   const [showSolutionsMenu, setShowSolutionsMenu] = useState(false);
   const isHomePage = pathname === '/';
+  const { getItemCount, cartAnimation } = useCart();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -198,16 +200,22 @@ export default function Header() {
             </Link>
           </nav>
 
-          <button
-            className={`transition-colors duration-300 ${
+          <Link
+            href="/cart"
+            className={`relative transition-colors duration-300 ${
               shouldShowSolidBg
                 ? 'text-foreground/80 hover:text-foreground'
                 : 'text-white/90 hover:text-white'
-            }`}
+            } ${cartAnimation ? 'animate-cart-bounce' : ''}`}
             aria-label="Shopping cart"
           >
             <ShoppingBag className="w-5 h-5" strokeWidth={1.5} />
-          </button>
+            {getItemCount() > 0 && (
+              <span className={`absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center ${cartAnimation ? 'animate-cart-badge' : ''}`}>
+                {getItemCount()}
+              </span>
+            )}
+          </Link>
         </div>
       </div>
     </header>
