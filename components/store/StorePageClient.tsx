@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import StoreSidebar from './StoreSidebar';
 import StoreGrid from './StoreGrid';
-import EnhancedStoreGrid from './EnhancedStoreGrid';
+import StoreHeader from './StoreHeader';
 import type { WooCommerceStoreCategory, WooCommerceStoreProduct } from '@/lib/woocommerce.types';
 import { getCategories, getProducts } from '@/lib/store-api';
 
@@ -18,6 +18,11 @@ export default function StorePageClient({ slug }: StorePageClientProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<'date' | 'price-asc' | 'price-desc' | 'name'>('date');
+  const [perPage, setPerPage] = useState(16);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+
   useEffect(() => {
     let mounted = true;
 
@@ -28,19 +33,15 @@ export default function StorePageClient({ slug }: StorePageClientProps) {
 
         console.log('🔍 [StorePageClient] Fetching data for slug:', slug);
 
-        // Fetch categories using unified store-api
         const filteredCategories = await getCategories();
         console.log('✅ [StorePageClient] Fetched categories:', filteredCategories.length);
-        console.log('📋 [StorePageClient] Available category slugs:', filteredCategories.map(c => c.slug));
 
         if (!mounted) return;
 
-        // Find current category by slug
         const category = filteredCategories.find(c => c.slug === slug);
 
         if (!category) {
           console.error('❌ [StorePageClient] Category not found:', slug);
-          console.error('❌ [StorePageClient] Available categories:', filteredCategories.map(c => c.slug));
           setError(`Category "${slug}" not found`);
           setCategories(filteredCategories);
           setLoading(false);
@@ -49,10 +50,9 @@ export default function StorePageClient({ slug }: StorePageClientProps) {
 
         console.log('✅ [StorePageClient] Current category:', category.name, 'ID:', category.id);
 
-        // Fetch products using unified store-api
         const productsData = await getProducts({
           category: category.id,
-          per_page: 24,
+          per_page: 100,
         });
         console.log('✅ [StorePageClient] Fetched products:', productsData.length);
 
@@ -79,9 +79,42 @@ export default function StorePageClient({ slug }: StorePageClientProps) {
     };
   }, [slug]);
 
+  const filteredAndSortedProducts = useMemo(() => {
+    let filtered = products;
+
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = products.filter(p =>
+        p.name.toLowerCase().includes(query) ||
+        p.description?.toLowerCase().includes(query) ||
+        p.sku?.toLowerCase().includes(query)
+      );
+    }
+
+    const sorted = [...filtered].sort((a, b) => {
+      switch (sortBy) {
+        case 'price-asc':
+          return (a.prices?.price ? parseInt(a.prices.price) : 0) - (b.prices?.price ? parseInt(b.prices.price) : 0);
+        case 'price-desc':
+          return (b.prices?.price ? parseInt(b.prices.price) : 0) - (a.prices?.price ? parseInt(a.prices.price) : 0);
+        case 'name':
+          return a.name.localeCompare(b.name);
+        case 'date':
+        default:
+          return b.id - a.id;
+      }
+    });
+
+    return sorted.slice(0, perPage);
+  }, [products, searchQuery, sortBy, perPage]);
+
+  const onSaleProducts = useMemo(() => {
+    return products.filter(p => p.on_sale);
+  }, [products]);
+
   if (loading) {
     return (
-      <main className="min-h-screen bg-white pt-20">
+      <main className="min-h-screen bg-gray-50 pt-20">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
@@ -96,7 +129,7 @@ export default function StorePageClient({ slug }: StorePageClientProps) {
 
   if (error) {
     return (
-      <main className="min-h-screen bg-white pt-20">
+      <main className="min-h-screen bg-gray-50 pt-20">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
@@ -127,12 +160,12 @@ export default function StorePageClient({ slug }: StorePageClientProps) {
 
   if (!currentCategory) {
     return (
-      <main className="min-h-screen bg-white pt-20">
+      <main className="min-h-screen bg-gray-50 pt-20">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
               <h1 className="text-2xl font-medium text-gray-900 mb-4">Category Not Found</h1>
-              <p className="text-gray-600">The category "{slug}" does not exist.</p>
+              <p className="text-gray-600">The category &quot;{slug}&quot; does not exist.</p>
             </div>
           </div>
         </div>
@@ -140,33 +173,37 @@ export default function StorePageClient({ slug }: StorePageClientProps) {
     );
   }
 
-  // 使用增强版 UI（黑色背景、渐变效果、滚动动画）
-  const useEnhancedUI = true;
-
-  if (useEnhancedUI) {
-    return (
-      <main className="min-h-screen bg-black">
-        <EnhancedStoreGrid
-          products={products}
-          categoryName={currentCategory.name}
-        />
-      </main>
-    );
-  }
-
-  // 原始 UI（白色背景、简单布局）
   return (
-    <main className="min-h-screen bg-white pt-20">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
-        <div className="flex gap-12">
+    <main className="min-h-screen bg-gray-50 pt-20">
+      <div className="max-w-[1600px] mx-auto px-6 lg:px-8 py-12">
+        <div className="flex gap-8">
           <StoreSidebar
             categories={categories}
             currentSlug={slug}
+            onSaleProducts={onSaleProducts}
           />
-          <StoreGrid
-            products={products}
-            categoryName={currentCategory.name}
-          />
+
+          <div className="flex-1">
+            <StoreHeader
+              categoryName={currentCategory.name}
+              productCount={filteredAndSortedProducts.length}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              sortBy={sortBy}
+              onSortChange={setSortBy}
+              perPage={perPage}
+              onPerPageChange={setPerPage}
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
+            />
+
+            <div className="mt-8">
+              <StoreGrid
+                products={filteredAndSortedProducts}
+                viewMode={viewMode}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </main>
