@@ -116,7 +116,7 @@ export default function HomePageClient() {
           className="absolute inset-0 w-full h-full object-cover"
           style={{ objectPosition: '55% center' }}
         >
-          <source src="/微逆拆解图.mp4" type="video/mp4" />
+          <source src="/25.mp4" type="video/mp4" />
         </video>
 
         <div className="absolute inset-0 bg-black/30" />

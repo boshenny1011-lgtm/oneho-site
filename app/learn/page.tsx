@@ -16,7 +16,7 @@ export default function LearnPage() {
             playsInline
             className="absolute inset-0 w-full h-full object-cover"
           >
-            <source src="/101.mp4" type="video/mp4" />
+            <source src="/25.mp4" type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/20 to-black/10" />
 
