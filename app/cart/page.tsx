@@ -12,7 +12,7 @@ import { ShoppingBag, X, Minus, Plus } from 'lucide-react';
 export default function CartPage() {
   const router = useRouter();
   const { items, removeItem, updateQuantity, getSubtotal, clearCart } = useCart();
-  const [country, setCountry] = useState('United States (US)');
+  const [country, setCountry] = useState('');
   const [state, setState] = useState('');
   const [city, setCity] = useState('');
   const [zipCode, setZipCode] = useState('');
@@ -148,17 +148,13 @@ export default function CartPage() {
 
               <div className="space-y-4">
                 <div>
-                  <select
+                  <input
+                    type="text"
+                    placeholder="Country"
                     value={country}
                     onChange={(e) => setCountry(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-gray-900 text-gray-600"
-                  >
-                    <option>United States (US)</option>
-                    <option>United Kingdom (UK)</option>
-                    <option>Germany</option>
-                    <option>France</option>
-                    <option>Spain</option>
-                  </select>
+                    className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-gray-900 placeholder:text-gray-400"
+                  />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
