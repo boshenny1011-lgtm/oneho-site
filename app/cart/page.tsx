@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -16,11 +16,49 @@ export default function CartPage() {
   const [state, setState] = useState('');
   const [city, setCity] = useState('');
   const [zipCode, setZipCode] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setIsLoading(false);
+  }, []);
 
   const subtotal = getSubtotal();
   const shippingRate = 22.00;
   const tax = 0;
   const total = subtotal + shippingRate + tax;
+
+  // Loading skeleton
+  if (isLoading) {
+    return (
+      <>
+        <Header />
+        <main className="min-h-screen bg-white pt-20">
+          <div className="max-w-[1400px] mx-auto px-6 lg:px-8 py-12">
+            <div className="h-10 bg-gray-200 rounded w-1/3 mb-12 animate-pulse" />
+
+            <div className="overflow-x-auto mb-12">
+              <div className="space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex items-center gap-4 border-b border-gray-200 pb-6">
+                    <div className="w-20 h-20 bg-gray-200 rounded animate-pulse" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-5 bg-gray-200 rounded w-1/3 animate-pulse" />
+                      <div className="h-4 bg-gray-200 rounded w-1/4 animate-pulse" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="bg-gray-100 h-64 rounded animate-pulse" />
+              <div className="bg-gray-100 h-64 rounded animate-pulse" />
+            </div>
+          </div>
+        </main>
+      </>
+    );
+  }
 
   if (items.length === 0) {
     return (
@@ -29,14 +67,27 @@ export default function CartPage() {
         <main className="min-h-screen bg-white pt-20">
           <div className="max-w-4xl mx-auto px-6 py-12">
             <div className="text-center py-20">
-              <ShoppingBag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h1 className="text-2xl font-medium mb-4">Your cart is empty</h1>
-              <Link
-                href="/store/microinverters"
-                className="inline-block px-6 py-3 bg-black text-white hover:bg-gray-800 transition-colors"
-              >
-                Continue Shopping
-              </Link>
+              <div className="bg-gray-100 rounded-full w-32 h-32 flex items-center justify-center mx-auto mb-6">
+                <ShoppingBag className="w-16 h-16 text-gray-400" />
+              </div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-3">Your cart is empty</h1>
+              <p className="text-gray-600 mb-8 max-w-md mx-auto">
+                Looks like you haven't added any products to your cart yet. Start shopping to fill it up!
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  href="/store"
+                  className="inline-block px-8 py-3 bg-black text-white font-bold rounded-full hover:bg-gray-800 transition-colors"
+                >
+                  Browse Products
+                </Link>
+                <Link
+                  href="/"
+                  className="inline-block px-8 py-3 border-2 border-gray-300 text-gray-700 font-bold rounded-full hover:border-gray-400 transition-colors"
+                >
+                  Back to Home
+                </Link>
+              </div>
             </div>
           </div>
         </main>
