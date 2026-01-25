@@ -28,7 +28,6 @@ export default function CheckoutPage() {
     shippingCity: '',
     shippingPostcode: '',
     shippingCountry: 'NL',
-    shippingMethod: 'standard',
     sameAsBilling: true,
   });
 
@@ -113,7 +112,6 @@ export default function CheckoutPage() {
           vatId: formData.vatId,
           phone: formData.phone,
         },
-        shippingMethod: formData.shippingMethod,
       });
 
       // Bolt 环境：直接跳转到成功页面
@@ -351,41 +349,6 @@ export default function CheckoutPage() {
                     </div>
                   </div>
                 )}
-              </section>
-
-              {/* 配送方式 */}
-              <section>
-                <h2 className="text-xl font-medium mb-4">Shipping Method</h2>
-                <div className="space-y-2">
-                  <label className="flex items-center p-4 border rounded-md cursor-pointer hover:bg-gray-50">
-                    <input
-                      type="radio"
-                      name="shippingMethod"
-                      value="standard"
-                      checked={formData.shippingMethod === 'standard'}
-                      onChange={handleChange}
-                      className="mr-3"
-                    />
-                    <div className="flex-1">
-                      <div className="font-medium">Standard Shipping</div>
-                      <div className="text-sm text-gray-600">€10.00 (Free over €100)</div>
-                    </div>
-                  </label>
-                  <label className="flex items-center p-4 border rounded-md cursor-pointer hover:bg-gray-50">
-                    <input
-                      type="radio"
-                      name="shippingMethod"
-                      value="express"
-                      checked={formData.shippingMethod === 'express'}
-                      onChange={handleChange}
-                      className="mr-3"
-                    />
-                    <div className="flex-1">
-                      <div className="font-medium">Express Shipping</div>
-                      <div className="text-sm text-gray-600">€25.00</div>
-                    </div>
-                  </label>
-                </div>
               </section>
             </div>
 
