@@ -62,7 +62,9 @@ export async function POST(request: NextRequest) {
       throw error;
     }
     
-    const stripe = new Stripe(STRIPE_SECRET_KEY, {
+    // 这里已经在上方校验过 STRIPE_SECRET_KEY 是否存在
+    // 为了通过 TypeScript 检查，显式断言为 string
+    const stripe = new Stripe(STRIPE_SECRET_KEY as string, {
       apiVersion: '2024-12-18.acacia',
     });
 
