@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 const WC_BASE_URL = process.env.WC_BASE_URL || 'https://linexpv.com';
 const WC_CONSUMER_KEY = process.env.WC_CONSUMER_KEY || '';
