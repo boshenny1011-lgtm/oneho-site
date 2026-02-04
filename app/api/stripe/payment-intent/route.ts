@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     // 动态导入 Stripe
     const Stripe = (await import('stripe')).default;
     const stripe = new Stripe(STRIPE_SECRET_KEY, {
-      apiVersion: '2024-12-18.acacia',
+      apiVersion: '2025-02-24.acacia',
     });
 
     // 解析请求体
