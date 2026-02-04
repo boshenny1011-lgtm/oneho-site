@@ -51,27 +51,7 @@ export default function EQMicroinverter1T1Page() {
           >
             <source src="/globe/26.mp4" type="video/mp4" />
           </video>
-
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-black/40" />
-
-          <div className="absolute inset-x-0 bottom-20 z-10">
-            <div className="max-w-4xl mx-auto px-6 text-center">
-              <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight tracking-tight">
-                EQ Microinverter 1T1
-              </h1>
-              <p className="text-xl md:text-2xl text-white/90 mb-8 leading-relaxed font-light">
-                The World's Lightest 500W Microinverter
-              </p>
-              <div className="flex items-center justify-center">
-                <Link
-                  href="/store"
-                  className="px-8 py-4 bg-white text-neutral-950 hover:bg-neutral-100 transition-colors duration-200 font-semibold rounded-full shadow-lg"
-                >
-                  Order Now
-                </Link>
-              </div>
-            </div>
-          </div>
         </section>
 
         <section className="relative bg-gradient-to-b from-neutral-100 to-white py-20">

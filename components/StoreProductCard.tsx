@@ -46,13 +46,13 @@ export default function StoreProductCard({ product, layout = 'grid' }: StoreProd
     return (
       <div className="group bg-white border border-gray-200 hover:shadow-lg transition-all duration-300">
         <div className="flex gap-6 p-6">
-          <Link href={`/product/${product.id}`} className="w-48 h-48 flex-shrink-0 bg-gray-50 relative overflow-hidden">
+          <Link href={`/product/${product.id}`} className="w-48 h-48 flex-shrink-0 bg-gray-50 relative overflow-hidden flex items-center justify-center">
             {imageUrl ? (
               <Image
                 src={imageUrl}
                 alt={product.name}
                 fill
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                className="object-contain p-3 transition-transform duration-500 group-hover:scale-105"
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
@@ -108,13 +108,13 @@ export default function StoreProductCard({ product, layout = 'grid' }: StoreProd
   return (
     <div className="group bg-white border border-gray-200 hover:shadow-lg transition-all duration-300">
       <Link href={`/product/${product.id}`} className="block">
-        <div className="aspect-square relative overflow-hidden bg-gray-50">
+        <div className="aspect-square relative overflow-hidden bg-gray-50 flex items-center justify-center">
           {imageUrl ? (
             <Image
               src={imageUrl}
               alt={product.name}
               fill
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              className="object-contain p-4 transition-transform duration-500 group-hover:scale-105"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
             />
           ) : (

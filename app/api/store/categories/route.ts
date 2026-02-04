@@ -3,18 +3,34 @@ import { NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-const WORDPRESS_BASE_URL = 'https://linexpv.com/wp';
+const WC_BASE_URL = process.env.WC_BASE_URL || 'https://linexpv.com';
+const WC_CONSUMER_KEY = process.env.WC_CONSUMER_KEY || '';
+const WC_CONSUMER_SECRET = process.env.WC_CONSUMER_SECRET || '';
 
 export async function GET() {
   try {
-    const url = `${WORDPRESS_BASE_URL}/wp-json/wc/store/v1/products/categories?per_page=100`;
+    // 检查 WooCommerce API 凭证
+    if (!WC_CONSUMER_KEY || !WC_CONSUMER_SECRET) {
+      console.error('❌ [API] WooCommerce API credentials not configured');
+      return NextResponse.json(
+        { error: 'WooCommerce API credentials not configured' },
+        { status: 500 }
+      );
+    }
+
+    const baseUrl = WC_BASE_URL.replace(/\/wp\/?$/, '').replace(/\/$/, '');
+    const url = `${baseUrl}/wp/wp-json/wc/v3/products/categories?per_page=100`;
     
     console.log('🔍 [API] Fetching categories from:', url);
+
+    // Basic Auth
+    const credentials = Buffer.from(`${WC_CONSUMER_KEY}:${WC_CONSUMER_SECRET}`).toString('base64');
 
     const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
+        'Authorization': `Basic ${credentials}`,
         'User-Agent': 'Next.js Store API',
       },
       cache: 'no-store',
@@ -48,11 +64,22 @@ export async function GET() {
     const categories = await response.json();
     console.log('✅ [API] Fetched categories:', categories.length);
 
-    // Filter categories: only children of parent=19
+    // Filter categories: only children of parent=19 (ONEHO)
     const filteredCategories = categories.filter((cat: any) => cat.parent === 19);
     console.log('✅ [API] Filtered categories (parent=19):', filteredCategories.length);
 
-    return NextResponse.json(filteredCategories);
+    // 转换为 Store API 格式
+    const transformedCategories = filteredCategories.map((cat: any) => ({
+      id: cat.id,
+      name: cat.name,
+      slug: cat.slug,
+      parent: cat.parent,
+      description: cat.description,
+      image: cat.image,
+      count: cat.count,
+    }));
+
+    return NextResponse.json(transformedCategories);
   } catch (error) {
     console.error('❌ [API] Error fetching categories:', error);
     return NextResponse.json(

@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { WooCommerceStoreProduct } from '@/lib/woocommerce.types';
-import { ArrowLeft, ShoppingCart, Truck, Shield, Loader2 } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Loader2 } from 'lucide-react';
 import { getBestProductImage } from '@/lib/image-matcher';
 import { useCart } from '@/contexts/CartContext';
 
@@ -176,32 +176,6 @@ export default function ProductDetailClient({ productId }: ProductDetailClientPr
                   <ShoppingCart className="w-5 h-5" />
                   {addingToCart ? 'Adding...' : 'Add to Cart'}
                 </button>
-              </div>
-
-              <div className="border-t border-border pt-8 space-y-4">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-secondary flex items-center justify-center flex-shrink-0">
-                    <Truck className="w-5 h-5 text-foreground" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-foreground mb-1">Free Shipping</h3>
-                    <p className="text-sm text-muted-foreground">
-                      On orders over €100
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-secondary flex items-center justify-center flex-shrink-0">
-                    <Shield className="w-5 h-5 text-foreground" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-foreground mb-1">2-Year Warranty</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Full coverage included
-                    </p>
-                  </div>
-                </div>
               </div>
 
               <div className="mt-8 pt-8 border-t border-border">

@@ -2,18 +2,21 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ShoppingBag, ChevronDown } from 'lucide-react';
+import { ShoppingBag, ChevronDown, User, LogOut } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useCart } from '@/contexts/CartContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Header() {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [showStoreMenu, setShowStoreMenu] = useState(false);
   const [showSolutionsMenu, setShowSolutionsMenu] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const isHomePage = pathname === '/';
   const { getItemCount, cartAnimation } = useCart();
+  const { user, isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -35,14 +38,14 @@ export default function Header() {
         <div className="flex items-center justify-between h-20 md:h-24">
           <Link
             href="/"
-            className="relative h-16 md:h-20 w-auto transition-opacity duration-300 hover:opacity-80 flex items-center"
+            className="relative h-20 md:h-24 w-auto transition-opacity duration-300 hover:opacity-80 flex items-center overflow-hidden"
           >
             <Image
               src="/24.png"
               alt="LinexPv Logo"
               width={800}
               height={240}
-              className="h-16 md:h-20 w-auto object-contain"
+              className="h-20 md:h-24 w-auto object-contain object-left scale-[1.35] origin-left"
               priority
             />
           </Link>
@@ -200,22 +203,103 @@ export default function Header() {
             </Link>
           </nav>
 
-          <Link
-            href="/cart"
-            className={`relative transition-colors duration-300 ${
-              shouldShowSolidBg
-                ? 'text-foreground/80 hover:text-foreground'
-                : 'text-white/90 hover:text-white'
-            } ${cartAnimation ? 'animate-cart-bounce' : ''}`}
-            aria-label="Shopping cart"
-          >
-            <ShoppingBag className="w-5 h-5" strokeWidth={1.5} />
-            {getItemCount() > 0 && (
-              <span className={`absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center ${cartAnimation ? 'animate-cart-badge' : ''}`}>
-                {getItemCount()}
-              </span>
+          {/* User Menu */}
+          <div className="flex items-center gap-4">
+            {isAuthenticated ? (
+              <div
+                className="relative"
+                onMouseEnter={() => setShowUserMenu(true)}
+                onMouseLeave={() => setShowUserMenu(false)}
+              >
+                <button
+                  className={`flex items-center gap-2 text-sm font-normal transition-colors duration-300 ${
+                    shouldShowSolidBg
+                      ? 'text-foreground/80 hover:text-foreground'
+                      : 'text-white/90 hover:text-white'
+                  }`}
+                >
+                  <User className="w-5 h-5" strokeWidth={1.5} />
+                  <span className="hidden md:inline max-w-[100px] truncate">
+                    {user?.displayName || user?.email?.split('@')[0]}
+                  </span>
+                  <ChevronDown
+                    className={`w-3 h-3 transition-transform duration-300 ${
+                      showUserMenu ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+
+                <div
+                  className={`absolute top-full right-0 pt-4 transition-all duration-300 ${
+                    showUserMenu
+                      ? 'opacity-100 translate-y-0 pointer-events-auto'
+                      : 'opacity-0 -translate-y-2 pointer-events-none'
+                  }`}
+                >
+                  <div
+                    className={`${
+                      shouldShowSolidBg
+                        ? 'bg-white border border-border shadow-xl'
+                        : 'bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl'
+                    } rounded-lg overflow-hidden min-w-[180px]`}
+                  >
+                    <div className="py-2">
+                      <Link
+                        href="/account"
+                        className="block px-4 py-2 text-sm text-foreground/80 hover:text-foreground hover:bg-secondary/50 transition-all duration-200"
+                      >
+                        My Account
+                      </Link>
+                      <Link
+                        href="/account?tab=orders"
+                        className="block px-4 py-2 text-sm text-foreground/80 hover:text-foreground hover:bg-secondary/50 transition-all duration-200"
+                      >
+                        Order History
+                      </Link>
+                      <hr className="my-2 border-border" />
+                      <button
+                        onClick={logout}
+                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-all duration-200"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Sign Out
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className={`flex items-center gap-1 text-sm font-normal transition-colors duration-300 ${
+                  shouldShowSolidBg
+                    ? 'text-foreground/80 hover:text-foreground'
+                    : 'text-white/90 hover:text-white'
+                }`}
+              >
+                <User className="w-5 h-5" strokeWidth={1.5} />
+                <span className="hidden md:inline">Sign In</span>
+              </Link>
             )}
-          </Link>
+
+            {/* Cart */}
+            <Link
+              href="/cart"
+              className={`relative transition-colors duration-300 ${
+                shouldShowSolidBg
+                  ? 'text-foreground/80 hover:text-foreground'
+                  : 'text-white/90 hover:text-white'
+              } ${cartAnimation ? 'animate-cart-bounce' : ''}`}
+              aria-label="Shopping cart"
+            >
+              <ShoppingBag className="w-5 h-5" strokeWidth={1.5} />
+              {getItemCount() > 0 && (
+                <span className={`absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center ${cartAnimation ? 'animate-cart-badge' : ''}`}>
+                  {getItemCount()}
+                </span>
+              )}
+            </Link>
+          </div>
         </div>
       </div>
     </header>
