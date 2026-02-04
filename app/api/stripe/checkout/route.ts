@@ -144,10 +144,10 @@ export async function POST(request: NextRequest) {
         }),
         // 存储配送地址（JSON 字符串）
         shipping: JSON.stringify(shippingAddress || billingAddress),
-        // 存储金额信息
+        // 存储金额信息（注意：运费用单独的 key，避免与上面的 shipping 地址冲突）
         subtotal: subtotal.toFixed(2),
         tax: tax.toFixed(2),
-        shipping: shipping.toFixed(2),
+        shippingAmount: shipping.toFixed(2),
         total: total.toFixed(2),
       },
     });
