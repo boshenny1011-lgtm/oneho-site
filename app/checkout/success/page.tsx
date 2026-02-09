@@ -7,20 +7,20 @@ import { CheckCircle, Package, MapPin, Mail, Phone } from 'lucide-react';
 
 export default function CheckoutSuccessPage() {
   const searchParams = useSearchParams();
-  const orderId = searchParams.get('order') || `EQ-${Date.now().toString().slice(-8)}`;
+  const orderId = searchParams?.get('order') || `EQ-${Date.now().toString().slice(-8)}`;
 
   // Mock order data - in real app, fetch from API/database
   const orderData = {
-    email: searchParams.get('email') || 'customer@example.com',
-    firstName: searchParams.get('firstName') || 'John',
-    lastName: searchParams.get('lastName') || 'Doe',
-    phone: searchParams.get('phone') || '+31 20 123 4567',
-    shippingAddress: searchParams.get('address') || '123 Main Street',
-    city: searchParams.get('city') || 'Amsterdam',
-    postcode: searchParams.get('postcode') || '1012 AB',
-    country: searchParams.get('country') || 'Netherlands',
-    items: searchParams.get('items') || '2',
-    total: searchParams.get('total') || '299.00',
+    email: searchParams?.get('email') || 'customer@example.com',
+    firstName: searchParams?.get('firstName') || 'John',
+    lastName: searchParams?.get('lastName') || 'Doe',
+    phone: searchParams?.get('phone') || '+31 20 123 4567',
+    shippingAddress: searchParams?.get('address') || '123 Main Street',
+    city: searchParams?.get('city') || 'Amsterdam',
+    postcode: searchParams?.get('postcode') || '1012 AB',
+    country: searchParams?.get('country') || 'Netherlands',
+    items: searchParams?.get('items') || '2',
+    total: searchParams?.get('total') || '299.00',
   };
 
   return (

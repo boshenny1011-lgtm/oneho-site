@@ -23,7 +23,7 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
 
   // 获取重定向 URL
-  const redirectUrl = searchParams.get('redirect') || '/account';
+  const redirectUrl = searchParams?.get('redirect') || '/account';
 
   // 如果已登录，重定向
   useEffect(() => {
@@ -111,7 +111,7 @@ export default function LoginPage() {
             )}
 
             {/* Info Message */}
-            {searchParams.get('redirect') && (
+            {searchParams?.get('redirect') && (
               <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-700 text-sm">
                 Please sign in to continue
               </div>
@@ -215,7 +215,7 @@ export default function LoginPage() {
             </p>
 
             {/* Guest Checkout */}
-            {searchParams.get('redirect')?.includes('checkout') && (
+            {searchParams?.get('redirect')?.includes('checkout') && (
               <div className="mt-6 pt-6 border-t border-gray-200">
                 <Link
                   href="/checkout"
