@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
+import { WORDPRESS_BASE_URL } from '@/lib/wp';
 
 export const dynamic = 'force-dynamic';
-
-const WORDPRESS_BASE_URL = 'https://linexpv.com/wp';
 
 export async function GET() {
   const results: any = {

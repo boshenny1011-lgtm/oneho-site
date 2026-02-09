@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ACCOUNT_STATUS_META_KEY, ACCOUNT_STATUS_APPROVED } from '../register/route';
+import { WORDPRESS_BASE_URL, normalizeWordPressUrl } from '@/lib/wp';
 
 export const runtime = 'nodejs';
 
-const WC_BASE_URL = process.env.WC_BASE_URL || 'https://linexpv.com';
 const WC_CONSUMER_KEY = process.env.WC_CONSUMER_KEY || '';
 const WC_CONSUMER_SECRET = process.env.WC_CONSUMER_SECRET || '';
 const ADMIN_SECRET = process.env.ADMIN_APPROVE_SECRET || process.env.ADMIN_SECRET || '';
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const baseUrl = WC_BASE_URL.replace(/\/wp\/?$/, '').replace(/\/$/, '');
+    const baseUrl = normalizeWordPressUrl(WORDPRESS_BASE_URL);
     const url = `${baseUrl}/wp-json/wc/v3/customers/${customerId}`;
     const credentials = Buffer.from(`${WC_CONSUMER_KEY}:${WC_CONSUMER_SECRET}`).toString('base64');
 

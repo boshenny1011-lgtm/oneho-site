@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { WORDPRESS_BASE_URL, normalizeWordPressUrl } from '@/lib/wp';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const WC_BASE_URL = process.env.WC_BASE_URL || 'https://linexpv.com';
 const WC_CONSUMER_KEY = process.env.WC_CONSUMER_KEY || '';
 const WC_CONSUMER_SECRET = process.env.WC_CONSUMER_SECRET || '';
 
@@ -51,8 +51,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 查询用户最新信息
-    const baseUrl = WC_BASE_URL.replace(/\/wp\/?$/, '').replace(/\/$/, '');
+    const baseUrl = normalizeWordPressUrl(WORDPRESS_BASE_URL);
     const url = `${baseUrl}/wp-json/wc/v3/customers/${tokenData.id}`;
     
     const credentials = Buffer.from(`${WC_CONSUMER_KEY}:${WC_CONSUMER_SECRET}`).toString('base64');

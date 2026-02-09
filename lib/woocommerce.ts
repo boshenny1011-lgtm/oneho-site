@@ -3,6 +3,7 @@ import type {
   WooCommerceStoreCategory,
   WooCommerceApiError,
 } from './woocommerce.types';
+import { WORDPRESS_BASE_URL } from './wp';
 
 export type {
   WooCommerceStoreProduct,
@@ -15,8 +16,7 @@ class WooCommerceClient {
   private storeApiBase: string;
 
   constructor() {
-    // Client-side only: hardcoded to linexpv.com/wp
-    this.baseUrl = "https://linexpv.com/wp";
+    this.baseUrl = WORDPRESS_BASE_URL;
     this.storeApiBase = `${this.baseUrl}/wp-json/wc/store/v1`;
 
     console.log('🏠 WooCommerce Client initialized (client-side)');

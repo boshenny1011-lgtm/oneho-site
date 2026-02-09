@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
+import { WORDPRESS_BASE_URL } from '@/lib/wp';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id') || '109';
 
   try {
-    const url = `https://linexpv.com/wp-json/wc/store/v1/products/${id}`;
+    const url = `${WORDPRESS_BASE_URL}/wp-json/wc/store/v1/products/${id}`;
     console.log('Testing URL:', url);
 
     const response = await fetch(url, {

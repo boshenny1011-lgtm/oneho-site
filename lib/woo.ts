@@ -1,11 +1,12 @@
 /**
  * WooCommerce REST API 客户端
- * 
+ *
  * 用于服务器端调用 WooCommerce REST API 创建订单
  * 使用 Basic Auth (Consumer Key / Consumer Secret)
  */
 
-const WC_BASE_URL = process.env.WC_BASE_URL || '';
+import { WORDPRESS_BASE_URL, normalizeWordPressUrl } from './wp';
+
 const WC_CONSUMER_KEY = process.env.WC_CONSUMER_KEY || '';
 const WC_CONSUMER_SECRET = process.env.WC_CONSUMER_SECRET || '';
 
@@ -14,17 +15,10 @@ const WC_CONSUMER_SECRET = process.env.WC_CONSUMER_SECRET || '';
  */
 function validateEnvVars(): string[] {
   const missing: string[] = [];
-  if (!WC_BASE_URL) missing.push('WC_BASE_URL');
+  if (!WORDPRESS_BASE_URL) missing.push('WC_BASE_URL');
   if (!WC_CONSUMER_KEY) missing.push('WC_CONSUMER_KEY');
   if (!WC_CONSUMER_SECRET) missing.push('WC_CONSUMER_SECRET');
   return missing;
-}
-
-/**
- * Normalize WC_BASE_URL: 移除末尾的 /wp（如果存在）
- */
-function normalizeBaseUrl(url: string): string {
-  return url.replace(/\/wp\/?$/, '').replace(/\/$/, '');
 }
 
 /**
@@ -42,8 +36,7 @@ async function wooRequest(
     throw new Error(`WooCommerce API credentials not configured. Missing: ${missingList}`);
   }
 
-  // Normalize base URL: 移除可能的 /wp 后缀
-  const baseUrl = normalizeBaseUrl(WC_BASE_URL);
+  const baseUrl = normalizeWordPressUrl(WORDPRESS_BASE_URL);
   const url = `${baseUrl}/wp-json/wc/v3${path}`;
   
   console.log(`🔍 [woo] Request: ${method} ${url}`);

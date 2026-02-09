@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
+import { WORDPRESS_BASE_URL, normalizeWordPressUrl } from '@/lib/wp';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-const WC_BASE_URL = process.env.WC_BASE_URL || 'https://linexpv.com';
 const WC_CONSUMER_KEY = process.env.WC_CONSUMER_KEY || '';
 const WC_CONSUMER_SECRET = process.env.WC_CONSUMER_SECRET || '';
 
@@ -18,7 +18,7 @@ export async function GET() {
       );
     }
 
-    const baseUrl = WC_BASE_URL.replace(/\/wp\/?$/, '').replace(/\/$/, '');
+    const baseUrl = normalizeWordPressUrl(WORDPRESS_BASE_URL);
     const url = `${baseUrl}/wp-json/wc/v3/products/categories?per_page=100`;
     const origin = baseUrl.startsWith('http') ? baseUrl : `https://${baseUrl}`;
 
