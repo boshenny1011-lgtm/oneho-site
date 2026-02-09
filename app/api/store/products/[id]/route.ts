@@ -73,12 +73,12 @@ export async function GET(
     }
 
     const baseUrl = WC_BASE_URL.replace(/\/wp\/?$/, '').replace(/\/$/, '');
-    const url = `${baseUrl}/wp/wp-json/wc/v3/products/${productId}`;
+    const url = `${baseUrl}/wp-json/wc/v3/products/${productId}`;
 
     console.log('🔍 [API] Fetching product:', productId);
     console.log('🔍 [API] Full URL:', url);
 
-    // Basic Auth
+    const origin = baseUrl.startsWith('http') ? baseUrl : `https://${baseUrl}`;
     const credentials = Buffer.from(`${WC_CONSUMER_KEY}:${WC_CONSUMER_SECRET}`).toString('base64');
 
     const response = await fetch(url, {
@@ -86,7 +86,9 @@ export async function GET(
       headers: {
         'Accept': 'application/json',
         'Authorization': `Basic ${credentials}`,
-        'User-Agent': 'Next.js Store API',
+        'User-Agent': 'Mozilla/5.0 (compatible; LinexPv-Store/1.0)',
+        'Referer': `${origin}/`,
+        'Origin': origin,
       },
       cache: 'no-store',
     });

@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     }
 
     const baseUrl = WC_BASE_URL.replace(/\/wp\/?$/, '').replace(/\/$/, '');
-    const url = `${baseUrl}/wp/wp-json/wc/v3/customers/${customerId}`;
+    const url = `${baseUrl}/wp-json/wc/v3/customers/${customerId}`;
     const credentials = Buffer.from(`${WC_CONSUMER_KEY}:${WC_CONSUMER_SECRET}`).toString('base64');
 
     // 先获取当前 meta，再更新 account_status

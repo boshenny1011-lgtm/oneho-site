@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     console.log('🔍 [auth/login] Attempting login for:', email);
 
     // 1) 先查 WooCommerce 客户（按邮箱），拿到 customer id 和 meta
-    const searchUrl = `${baseUrl}/wp/wp-json/wc/v3/customers?email=${encodeURIComponent(email)}`;
+    const searchUrl = `${baseUrl}/wp-json/wc/v3/customers?email=${encodeURIComponent(email)}`;
     const searchResponse = await fetch(searchUrl, {
       method: 'GET',
       headers: { 'Authorization': `Basic ${credentials}` },
@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 3) 用 JWT 验证密码（WordPress 需安装 JWT Authentication for WP REST API）
-    const jwtUrl = `${baseUrl}/wp/wp-json/jwt-auth/v1/token`;
+    const jwtUrl = `${baseUrl}/wp-json/jwt-auth/v1/token`;
     const jwtResponse = await fetch(jwtUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

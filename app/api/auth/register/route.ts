@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
 
     // 构建 WooCommerce Customer 请求
     const baseUrl = WC_BASE_URL.replace(/\/wp\/?$/, '').replace(/\/$/, '');
-    const url = `${baseUrl}/wp/wp-json/wc/v3/customers`;
+    const url = `${baseUrl}/wp-json/wc/v3/customers`;
 
     console.log('🔍 [auth/register] Creating customer:', email);
 

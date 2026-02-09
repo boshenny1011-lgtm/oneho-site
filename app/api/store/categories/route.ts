@@ -19,8 +19,9 @@ export async function GET() {
     }
 
     const baseUrl = WC_BASE_URL.replace(/\/wp\/?$/, '').replace(/\/$/, '');
-    const url = `${baseUrl}/wp/wp-json/wc/v3/products/categories?per_page=100`;
-    
+    const url = `${baseUrl}/wp-json/wc/v3/products/categories?per_page=100`;
+    const origin = baseUrl.startsWith('http') ? baseUrl : `https://${baseUrl}`;
+
     console.log('🔍 [API] Fetching categories from:', url);
 
     // Basic Auth
@@ -31,7 +32,9 @@ export async function GET() {
       headers: {
         'Accept': 'application/json',
         'Authorization': `Basic ${credentials}`,
-        'User-Agent': 'Next.js Store API',
+        'User-Agent': 'Mozilla/5.0 (compatible; LinexPv-Store/1.0)',
+        'Referer': `${origin}/`,
+        'Origin': origin,
       },
       cache: 'no-store',
     });

@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
 
     // 构建 WooCommerce REST API v3 URL
     const baseUrl = WC_BASE_URL.replace(/\/wp\/?$/, '').replace(/\/$/, '');
-    const url = new URL(`${baseUrl}/wp/wp-json/wc/v3/products`);
+    const url = new URL(`${baseUrl}/wp-json/wc/v3/products`);
     
     if (category) {
       url.searchParams.set('category', category);
@@ -88,12 +88,15 @@ export async function GET(request: NextRequest) {
     // Basic Auth
     const credentials = Buffer.from(`${WC_CONSUMER_KEY}:${WC_CONSUMER_SECRET}`).toString('base64');
 
+    const origin = baseUrl.startsWith('http') ? baseUrl : `https://${baseUrl}`;
     const response = await fetch(url.toString(), {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
         'Authorization': `Basic ${credentials}`,
-        'User-Agent': 'Next.js Store API',
+        'User-Agent': 'Mozilla/5.0 (compatible; LinexPv-Store/1.0)',
+        'Referer': `${origin}/`,
+        'Origin': origin,
       },
       cache: 'no-store',
     });

@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
 
     // 查询用户订单
     const baseUrl = WC_BASE_URL.replace(/\/wp\/?$/, '').replace(/\/$/, '');
-    const url = `${baseUrl}/wp/wp-json/wc/v3/orders?customer=${tokenData.id}&page=${page}&per_page=${perPage}&orderby=date&order=desc`;
+    const url = `${baseUrl}/wp-json/wc/v3/orders?customer=${tokenData.id}&page=${page}&per_page=${perPage}&orderby=date&order=desc`;
     
     const credentials = Buffer.from(`${WC_CONSUMER_KEY}:${WC_CONSUMER_SECRET}`).toString('base64');
 
